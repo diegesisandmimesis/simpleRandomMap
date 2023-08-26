@@ -38,9 +38,15 @@ versionInfo:    GameID
 	}
 ;
 
-startRoom: Room 'Void'
-        "This is a featureless void."
-;
-+me: Person;
+PreinitObject
+	execute() {
+		local obj;
 
-gameMain:       GameMainDef initialPlayerChar = me;
+		obj = new SimpleRandomMapGenerator();
+		obj.preinit();
+	}
+;
+
+me: Person;
+
+gameMain: GameMainDef initialPlayerChar = me;
