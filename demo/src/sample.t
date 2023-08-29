@@ -38,14 +38,7 @@ versionInfo:    GameID
 	}
 ;
 
-PreinitObject
-	execute() {
-		local obj;
-
-		obj = new SimpleRandomMapGenerator();
-		obj.preinit();
-	}
-;
+map: SimpleRandomMapGenerator;
 
 me: Person;
 
