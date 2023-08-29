@@ -1,6 +1,6 @@
 #charset "us-ascii"
 //
-// sample.t
+// gridTest.t
 // Version 1.0
 // Copyright 2022 Diegesis & Mimesis
 //
@@ -8,7 +8,7 @@
 //
 // It can be compiled via the included makefile with
 //
-//	# t3make -f makefile.t3m
+//	# t3make -f gridTest.t3m
 //
 // ...or the equivalent, depending on what TADS development environment
 // you're using.
@@ -29,16 +29,17 @@ versionInfo:    GameID
 		"This is a simple test game that demonstrates the features
 		of the simpleRandomMap library.
 		<.p>
-		The map is a 10x10 square of rooms randomly connected via
-		an algorithm that guarantees that all rooms are reachable. ";
+		The makefile for this demo contains -D SIMPLE_RANDOM_MAP_GRID
+		so the map should consist of rooms with exits to the north,
+		south, east, and west except at the edges of the map.
+		<.p> ";
 #ifdef __DEBUG_SIMPLE_RANDOM_MAP
 		"<.p>
 		You can display a simple ASCII map of the area around your
 		current location by typing:
 		<.p>\t<b>&gt;M</b> ";
 #endif // __DEBUG_SIMPLE_RANDOM_MAP
-		"<.p>
-		Consult the README.txt document distributed with the library
+		"Consult the README.txt document distributed with the library
 		source for a quick summary of how to use the library in your
 		own games.
 		<.p>

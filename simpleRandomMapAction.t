@@ -9,6 +9,8 @@
 
 #ifdef SIMPLE_RANDOM_MAP
 
+#ifdef __DEBUG_SIMPLE_RANDOM_MAP
+
 modify playerActionMessages
 	srmNoRoom = 'Map display failed:  unable to determine current room. '
 	srmBadRoom = 'Map display failed:  not in a mappable room. '
@@ -16,7 +18,7 @@ modify playerActionMessages
 		generator. '
 ;
 
-DefineSystemAction(Srm)
+DefineSystemAction(SimpleRandomMap)
 	execSystemAction() {
 		local buf, buf0, buf1, buf2, obj, rm, rm0, v, x, y, x0, y0, x1, y1;
 
@@ -92,6 +94,7 @@ DefineSystemAction(Srm)
 		defaultReport(toString(buf));
 	}
 ;
-VerbRule(Srm) 'srm' : SrmAction verbPhrase = 'srm/srming';
+VerbRule(SimpleRandomMap) 'm' : SimpleRandomMapAction verbPhrase = 'm/ming';
 
+#endif // __DEBUG_SIMPLE_RANDOM_MAP
 #endif // SIMPLE_RANDOM_MAP

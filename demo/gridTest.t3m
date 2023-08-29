@@ -2,9 +2,10 @@
 -D MESSAGESTYLE=neu
 -D __DEBUG_SIMPLE_RANDOM_MAP
 -D SIMPLE_RANDOM_MAP
+-D SIMPLE_RANDOM_MAP_GRID
 -Fy obj -Fo obj
--o games/game.t3
+-o games/gridTest.t3
 -lib system
 -lib adv3/adv3
 -lib ../simpleRandomMap
--source src/sample.t
+-source src/gridTest.t

@@ -4,7 +4,12 @@
 //
 //	A TADS3 module for producing simple random maps.
 //
-//	Example usage:
+//
+//	BASIC USAGE
+//
+//	Generation is automatic and self-contained, so the only source
+//	modification that's required is the addition of a declared
+//	instance of the SimpleRandomMapGenerator class.  Example usage:
 //
 //		myMap: SimpleRandomMapGenerator;
 //
@@ -40,6 +45,38 @@
 //
 //	It WILL NOT produce maps suitable for direct inclusion in playable
 // 	games.
+//
+//
+//	COMPILER FLAGS
+//
+//	These flags control what module features are compiled in.  The
+//	can be specified via -D [option] on the command line or
+//	in your project's makefile.
+//
+//		SIMPLE_RANDOM_MAP
+//			Toggles the entire module.  Compile with this flag
+//			to enable the module, compile without it to disable
+//			everything.
+//
+//		SIMPLE_RANDOM_MAP_GRID
+//			If set, instead of generating random exits for each
+//			room, every room will get exits in ALL of the four main
+//			compass directions (N, S, E, W) except at the edges of
+//			the map.
+//
+//		__DEBUG_SIMPLE_RANDOM_MAP
+//			Enables debugging options, notably the debugging
+//			commands discussed in the next section.
+//
+//	
+//	DEBUGGING COMMANDS
+//
+//	The following commands are available if the module is compiled
+//	with -D __DEBUG_SIMPLE_RANDOM_MAP.
+//
+//		M		Displays a simple ASCII map of the map
+//				around the player.
+//	
 //
 #include <adv3.h>
 #include <en_us.h>
@@ -214,6 +251,12 @@ class SimpleRandomMapGenerator: object
 				// Room is on the north edge, connect east.
 				_connectEast(i);
 			} else {
+#ifdef SIMPLE_RANDOM_MAP_GRID
+				// If we were compiled with the "grid" flag,
+				// generate an exit north AND east.
+				_connectNorth(i);
+				_connectEast(i);
+#else // SIMPLE_RANDOM_MAP_GRID
 				// Room is not on the north or east edge, flip
 				// a coin.
 				if(rand(2) == 1) {
@@ -221,6 +264,7 @@ class SimpleRandomMapGenerator: object
 				} else {
 					_connectEast(i);
 				}
+#endif // SIMPLE_RANDOM_MAP_GRID
 			}
 		}
 	}
