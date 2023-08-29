@@ -70,7 +70,7 @@ DefineSystemAction(SimpleRandomMap)
 				if(rm == rm0)
 					buf1.append('[*]');
 				else
-					buf1.append('[.]');
+					buf1.append('[_]');
 				if(rm0.east)
 					buf1.append('===');
 				else
