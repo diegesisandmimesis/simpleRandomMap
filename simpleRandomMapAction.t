@@ -67,11 +67,10 @@ DefineSystemAction(SimpleRandomMap)
 					buf1.append('===');
 				else
 					buf1.append('...');
-				//buf1.append('<<toString(rm0.simpleRandomMapID)>> ');
 				if(rm == rm0)
-					buf1.append('***');
+					buf1.append('[*]');
 				else
-					buf1.append('###');
+					buf1.append('[.]');
 				if(rm0.east)
 					buf1.append('===');
 				else
