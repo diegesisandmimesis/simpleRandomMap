@@ -259,7 +259,7 @@ class SimpleRandomMapGenerator: object
 		}
 	}
 
-	xyToRoom(x, y) { return(_getRoom((y * mapWidth) + x)); }
+	xyToRoom(x, y) { return(_getRoom(((y - 1) * mapWidth) + x)); }
 ;
 
 #endif // SIMPLE_RANDOM_MAP
