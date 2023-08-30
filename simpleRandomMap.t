@@ -119,6 +119,10 @@ class SimpleRandomMapRoom: Room
 	// A reference to the generator that created the room instance.
 	simpleRandomMapGenerator = nil
 
+	// Flag used by some generators to indicate whether or not
+	// this room has been added to the map yet or not.
+	simpleRandomMapFlag = nil
+
 	// Returns the coordinates of this room as a text string.
 	getCoords() {
 		return('( <<toString(simpleRandomMapXY[1])>>,
@@ -126,7 +130,8 @@ class SimpleRandomMapRoom: Room
 	}
 ;
 
-enum simpleRandomMapEast, simpleRandomMapNorth;
+enum simpleRandomMapNorth, simpleRandomMapSouth, simpleRandomMapEast,
+	simpleRandomMapWest;
 
 class SimpleRandomMapGenerator: object
 	// The generated maps are always square.  mapWidth determines
@@ -153,13 +158,17 @@ class SimpleRandomMapGenerator: object
 	construct(n?) { if(n != nil) mapWidth = n; }
 
 	// Compute the total map size.
-	_checkDefaults() { _mapSize = mapWidth * mapWidth; }
+	_checkDefaults() {
+		_mapSize = mapWidth * mapWidth;
+		return(true);
+	}
 
 	// Preinit method.  This is where we do everything we need to do.
 	// Called by the PreinitObject.
 	preinit() {
 		// Validate our configuration.
-		_checkDefaults();
+		if(_checkDefaults() != true)
+			return;
 
 		// Create the room objects.
 		_createRooms();
@@ -291,19 +300,71 @@ class SimpleRandomMapGenerator: object
 		if((rm1 = _getRoom(n1)) == nil)
 			return;
 
+		_connectRoomObjs(rm0, rm1, dir);
+	}
+
+	_connectRoomObjs(rm0, rm1, dir) {
 		switch(dir) {
 			case simpleRandomMapNorth:
 				rm0.north = rm1;
 				rm1.south = rm0;
 				break;
+			case simpleRandomMapSouth:
+				rm0.south = rm1;
+				rm1.north = rm0;
+				break;
 			case simpleRandomMapEast:
 				rm0.east = rm1;
 				rm1.west = rm0;
 				break;
+			case simpleRandomMapWest:
+				rm0.west = rm1;
+				rm1.east = rm0;
+				break;
 		}
 	}
 
+	// Returns the room with the given coordinates, if it exists.
 	xyToRoom(x, y) { return(_getRoom(((y - 1) * mapWidth) + x)); }
+
+	// Get the neighboring room in the given direction.
+	getNeighbor(rm, dir) {
+		local offX, offY, x, y;
+
+		if((rm == nil) || !rm.ofKind(SimpleRandomMapRoom))
+			return(nil);
+
+		x = rm.simpleRandomMapXY[1];
+		y = rm.simpleRandomMapXY[2];
+
+		offX = 0;
+		offY = 0;
+
+		switch(dir) {
+			case simpleRandomMapNorth:
+				if(y >= mapWidth)
+					return(nil);
+				offY = 1;
+				break;
+			case simpleRandomMapSouth:
+				if(y <= 1)
+					return(nil);
+				offY = -1;
+				break;
+			case simpleRandomMapEast:
+				if(x >= mapWidth)
+					return(nil);
+				offX = 1;
+				break;
+			case simpleRandomMapWest:
+				if(x <= 1)
+					return(nil);
+				offX = -1;
+				break;
+		}
+
+		return(xyToRoom(x + offX, y + offY));
+	}
 ;
 
 #endif // SIMPLE_RANDOM_MAP
