@@ -146,7 +146,11 @@ class SimpleRandomMapNeighbor: object
 class SimpleRandomMapGenerator: object
 	// The generated maps are always square.  mapWidth determines
 	// how many rooms wide and high the square is.
+#ifdef SIMPLE_RANDOM_MAP_WIDTH
+	mapWidth = SIMPLE_RANDOM_MAP_WIDTH
+#else // SIMPLE_RANDOM_MAP_WIDTH
 	mapWidth = 10
+#endif // SIMPLE_RANDOM_MAP_WIDTH
 
 	// Boolean flag indicating whether or not the player should be
 	// moved to the first room of the map as part of the map generation
