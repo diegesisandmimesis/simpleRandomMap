@@ -29,8 +29,10 @@ versionInfo:    GameID
 		"This is a simple test game that demonstrates the features
 		of the simpleRandomMap library.
 		<.p>
-		The map is a 10x10 square of rooms randomly connected via
-		an algorithm that guarantees that all rooms are reachable. ";
+		The map is generated via a recursive backtracking algorithm,
+		which should generate a map with a lot of <q>rivers</q>, which
+		is to say the map should have a smaller number of longer
+		dead ends compared to the base generator. ";
 #ifdef __DEBUG_SIMPLE_RANDOM_MAP
 		"<.p>
 		You can display a simple ASCII map of the area around your

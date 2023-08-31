@@ -1,6 +1,6 @@
 #charset "us-ascii"
 //
-// rbTest.t
+// braidTest.t
 // Version 1.0
 // Copyright 2022 Diegesis & Mimesis
 //
@@ -8,7 +8,7 @@
 //
 // It can be compiled via the included makefile with
 //
-//	# t3make -f rbTest.t3m
+//	# t3make -f braidTest.t3m
 //
 // ...or the equivalent, depending on what TADS development environment
 // you're using.
@@ -29,8 +29,8 @@ versionInfo:    GameID
 		"This is a simple test game that demonstrates the features
 		of the simpleRandomMap library.
 		<.p>
-		The map is a 10x10 square of rooms randomly connected via
-		an algorithm that guarantees that all rooms are reachable. ";
+		The map should be <q>braided</q>, which is to say that there
+		should be no dead ends. ";
 #ifdef __DEBUG_SIMPLE_RANDOM_MAP
 		"<.p>
 		You can display a simple ASCII map of the area around your
