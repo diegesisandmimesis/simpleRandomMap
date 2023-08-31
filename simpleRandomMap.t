@@ -58,6 +58,12 @@
 //			to enable the module, compile without it to disable
 //			everything.
 //
+//		SIMPLE_RANDOM_MAP_WIDTH=x
+//			Uses x as the default width for all map types.  Note
+//			that this WILL NOT override an explicit mapWidth
+//			declared on an instance.  It just changes the default
+//			value.
+//
 //		SIMPLE_RANDOM_MAP_GRID
 //			If set, instead of generating random exits for each
 //			room, every room will get exits in ALL of the four main
