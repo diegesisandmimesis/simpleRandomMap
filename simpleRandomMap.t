@@ -133,6 +133,16 @@ class SimpleRandomMapRoom: Room
 enum simpleRandomMapNorth, simpleRandomMapSouth, simpleRandomMapEast,
 	simpleRandomMapWest;
 
+// Simple data structure for holding information about map neighbors.
+class SimpleRandomMapNeighbor: object
+	room = nil
+	dir = nil
+	construct(rm?, d?) {
+		room = rm;
+		dir = d;
+	}
+;
+
 class SimpleRandomMapGenerator: object
 	// The generated maps are always square.  mapWidth determines
 	// how many rooms wide and high the square is.
@@ -152,6 +162,12 @@ class SimpleRandomMapGenerator: object
 
 	// Table to hold the generated rooms.
 	_rooms = perInstance(new LookupTable)
+
+	// The base generator only generates exits in two directions,
+	// but we define this because other generators pick random directions
+	// from any of the four non-diagonal compass directions.
+	_dirs = static [ simpleRandomMapNorth, simpleRandomMapSouth,
+		simpleRandomMapEast, simpleRandomMapWest ]
 
 	// Constructor.
 	// The optional arg is the map width.
@@ -364,6 +380,156 @@ class SimpleRandomMapGenerator: object
 		}
 
 		return(xyToRoom(x + offX, y + offY));
+	}
+
+	// Returns an array of all the von Neumann neighbors of the given room.
+	// Each element of the array is a 2-element array containing
+	// the neighboring room and its direction (from the enum)
+	// indicating its position relative to the original room
+	getNeighbors(rm, allowUsed?) {
+		local neighbors, rm0;
+
+		// Make sure we have a valid room.
+		if((rm == nil) || !rm.ofKind(SimpleRandomMapRoom))
+			return(nil);
+
+		// Make an empty vector to hold our options.
+		neighbors = new Vector(4);
+
+		// Go through all possible directions, check to see
+		// if the neighbor in that direction is valid.
+		_dirs.forEach(function(o) {
+			// Nope, no neighbor.
+			if((rm0 = getNeighbor(rm, o)) == nil)
+				return;
+
+			// Got a neighbor, but it's already used.
+			if(!allowUsed && (rm0.simpleRandomMapFlag == true))
+				return;
+
+			// Looks good, remember the direction and room.
+			neighbors.append(new SimpleRandomMapNeighbor(rm0, o));
+		});
+
+		// No options, bail.
+		if(neighbors.length == 0)
+			return(nil);
+
+		return(neighbors);
+	}
+
+	// Pick a random (unused) von Neumann neighbor for the given room.
+	// Returns an instance of the SimpleRandomMapNeighbor class.
+	getRandomNeighbor(rm, allowUsed?, skipConnected?) {
+		local conn, l;
+
+		// Make sure we have valid neighbors.
+		if((l = getNeighbors(rm, allowUsed)) == nil)
+			return(nil);
+
+		// If we don't care whether or not the neighbors are
+		// currently connected, we're done.
+		if(skipConnected != true)
+			return(l[rand(l.length) + 1]);
+
+		// This shouldn't happen, but this says that none of
+		// our neighbors are connected.  That means that none
+		// of the neighbors above are disqualified, so...punt.
+		if((conn = getConnectedNeighbors(rm)) == nil)
+			return(l[rand(l.length) + 1]);
+
+		// Now go through our list of connected neighbors and
+		// remove them from our list of ALL neighbors.
+		conn.forEach(function(rm0) {
+			local v;
+
+			if((v = l.valWhich({x: x.room == rm0.room})) == nil)
+				return;
+			l.removeElement(v);
+		});
+
+		// If we removed all the neighbors, return nil instead
+		// of an empty list.
+		if(l.length == 0)
+			return(nil);
+
+		// Return a random remaining neighbor.
+		return(l[rand(l.length) + 1]);
+	}
+
+	// Get all of the von Neumann neighbors of the given room that
+	// are connected via exits.
+	getConnectedNeighbors(rm) {
+		local l, r;
+
+		if((l = getNeighbors(rm, true)) == nil)
+			return(nil);
+
+		r = new Vector(l.length);
+
+		l.forEach(function(o) {
+			switch(o.dir) {
+				case simpleRandomMapNorth:
+					if(rm.north == o.room)
+						r.append(o);
+					break;
+				case simpleRandomMapSouth:
+					if(rm.south == o.room)
+						r.append(o);
+					break;
+				case simpleRandomMapEast:
+					if(rm.east == o.room)
+						r.append(o);
+					break;
+				case simpleRandomMapWest:
+					if(rm.west == o.room)
+						r.append(o);
+					break;
+			}
+		});
+
+		if(r.length == 0)
+			return(nil);
+
+		return(r);
+	}
+
+	// Returns a list of dead ends.
+	listDeadEnds() {
+		local r;
+
+		// Vector to hold our list.
+		r = new Vector(_mapSize);
+
+		// We just walk through the list of all the rooms, looking
+		// for ones that are only have one connection.
+		_rooms.forEach(function(rm) {
+			// See if the room is a dead end.
+			if(isDeadEnd(rm) != true)
+				return;
+
+			// If we reach this point, the room is a dead end.
+			// Add it to the list.
+			r.append(rm);
+		});
+
+		// Return the list.
+		return(r);
+	}
+
+	// Returns boolean true iff the room is a dead end.  That is,
+	// if it is connected to exactly one room.
+	isDeadEnd(rm) {
+		local l;
+
+		// This should never happen;  it indicates that the
+		// room isn't connected at all.  At any rate, whatever's
+		// going on here isn't our problem, bail.
+		if((l = getConnectedNeighbors(rm)) == nil)
+			return(nil);
+
+		// Dead ends have exactly one connected neighbor.
+		return(l.length == 1);
 	}
 ;
 

@@ -14,12 +14,6 @@
 // dead ends and few long dead ends.  This generator should do the opposite:
 // long dead ends, but fewer of them.
 class SimpleRandomMapGeneratorRB: SimpleRandomMapGenerator
-	// Unlike the base generator, at any "step" me might want to dig
-	// an exit in any direction (where "any" means the four non-diagonal
-	// compass directions).
-	_dirs = static [ simpleRandomMapNorth, simpleRandomMapSouth,
-		simpleRandomMapEast, simpleRandomMapWest ]
-
 	// Replacement map builder.
 	// We start out with the starting room, setting it as the current
 	// room and pushing it onto a stack.  Then as long as we have any
@@ -32,7 +26,7 @@ class SimpleRandomMapGeneratorRB: SimpleRandomMapGenerator
 	// remove it from the stack.
 	// When the stack is empty, we're done.
 	_buildMap() {
-		local rm, rm0, stack;
+		local rm, stack, v;
 
 		// Worst case stack size is the size of the map.
 		stack = new Vector(_mapSize);
@@ -43,17 +37,24 @@ class SimpleRandomMapGeneratorRB: SimpleRandomMapGenerator
 
 		// Loop while we have a valid room.
 		while(rm != nil) {
+			// Mark the room as "used".
+			rm.simpleRandomMapFlag = true;
+
 			// We try to pick a random neighbor from the
 			// current room.
-			if((rm0 = _nextRoom(rm)) == nil) {
+			if((v = getRandomNeighbor(rm)) == nil) {
 				// If there are no valid neighbors to pick,
 				// remove the current room from the stack.
 				stack.removeElement(rm);
 			} else {
-				// Otherwise, we add the newly-picked neighbor
-				// to the stack.
-				stack.appendUnique(rm0);
+				// Connect the original room to the neighbor
+				// and vice versa.
+				_connectRoomObjs(rm, v.room, v.dir);
+
+				// Add the neighbor to the stack.
+				stack.appendUnique(v.room);
 			}
+
 			// If our stack length is zero, we're done.  Otherwise
 			// we pick the top of the stack, set it as the current
 			// room, and iterate.
@@ -62,52 +63,6 @@ class SimpleRandomMapGeneratorRB: SimpleRandomMapGenerator
 			else
 				rm = stack[stack.length];
 		}
-	}
-
-	// Pick a valid neighbor from the given room.
-	_nextRoom(rm) {
-		local dirs, idx, r, rm0;
-
-		// Make sure we have a valid room.
-		if((rm == nil) || !rm.ofKind(SimpleRandomMapRoom))
-			return(nil);
-
-		// Make an empty vector to hold our options.
-		dirs = new Vector(4);
-
-		// Go through all possible directions, check to see
-		// if the neighbor in that direction is valid.
-		_dirs.forEach(function(o) {
-			// Nope, no neighbor.
-			if((rm0 = getNeighbor(rm, o)) == nil)
-				return;
-
-			// Got a neighbor, but it's already used.
-			if(rm0.simpleRandomMapFlag == true)
-				return;
-
-			// Looks good, remember the direction and room.
-			dirs.append([o, rm0]);
-		});
-
-		// No options, bail.
-		if(dirs.length == 0)
-			return(nil);
-
-		// Pick a random option.
-		idx = rand(dirs.length) + 1;
-		r = dirs[idx];
-
-		// Connect the original room to the neighbor in the appropriate
-		// direction.
-		_connectRoomObjs(rm, r[2], r[1]);
-
-		// Mark the rooms as used.
-		rm.simpleRandomMapFlag = true;
-		r[2].simpleRandomMapFlag = true;
-		
-		// Return the neighbor.
-		return(r[2]);
 	}
 ;
 
