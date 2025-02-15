@@ -93,7 +93,15 @@ DefineSystemAction(SimpleRandomMap)
 			// Add padding onto the end of each line, then
 			// add it to the main output buffer.
 			buf0.append('...\n ');
-			buf1.append('...\n ');
+
+			// Never needed if we're a single random maze,
+			// but check to see if we're connected to
+			// something else.
+			if(rm0.east)
+				buf1.append('===\n ');
+			else
+				buf1.append('...\n ');
+
 			buf.append(buf0);
 			buf.append(buf1);
 		}
@@ -103,7 +111,14 @@ DefineSystemAction(SimpleRandomMap)
 		if(obj.mapWidth <= 10) {
 			buf0.deleteChars(0);
 			for(x = x0; x <= x1; x++) {
-				buf0.append('......');
+				buf0.append('...');
+				rm0 = obj.xyToRoom(x, y0);
+				if(rm0.south)
+					buf0.append('.|.');
+				else
+					buf0.append('...');
+
+				//buf0.append('......');
 			}
 			buf0.append('...\n ');
 			buf.append(buf0);

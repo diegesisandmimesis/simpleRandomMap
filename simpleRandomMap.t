@@ -166,6 +166,14 @@ class SimpleRandomMapGenerator: object
 	// Object to use as the player.  Only used if movePlayer is true.
 	player = gameMain.initialPlayerChar
 
+	roomClass = SimpleRandomMapRoom
+	roomBaseName = 'room'
+
+	firstRoom() { return(_rooms[1]); }
+	lastRoom() { return(_rooms[_mapSize]); }
+
+	beforeFirst = nil
+	afterLast = nil
 
 	// The computed map size.
 	_mapSize = nil
@@ -206,6 +214,16 @@ class SimpleRandomMapGenerator: object
 		// map we just generated, do so now.
 		if(movePlayer == true)
 			player.baseMoveInto(_getRoom(1));
+
+		if(beforeFirst) {
+			beforeFirst.north = _rooms[1];
+			_rooms[1].south = beforeFirst;
+		}
+
+		if(afterLast) {
+			afterLast.south = _rooms[_mapSize];
+			_rooms[_mapSize] = afterLast.south;
+		}
 	}
 
 	// Create the room objects, saving them to the lookup table.
@@ -216,10 +234,10 @@ class SimpleRandomMapGenerator: object
 		y = 0;
 		for(i = 1; i <= _mapSize; i++) {
 			// The room name is just "room" plus a number.
-			id = 'room' + toString(i);
+			id = roomBaseName + toString(i);
 
 			// Create a new room instance.
-			rm = new SimpleRandomMapRoom();
+			rm = roomClass.createInstance();
 
 			// Make the name the ID we generated above.
 			rm.roomName = id;
