@@ -559,6 +559,13 @@ class SimpleRandomMapGenerator: object
 		// Dead ends have exactly one connected neighbor.
 		return(l.length == 1);
 	}
+
+	getRandomRoom() {
+		local l;
+
+		l = _rooms.keysToList();
+		return(_rooms[rand(l.length) + 1]);
+	}
 ;
 
 #endif // SIMPLE_RANDOM_MAP
